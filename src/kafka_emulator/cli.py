@@ -9,10 +9,10 @@ def print_to_stderr_and_exit(e: Exception, exit_code: int) -> None:
 
 
 def run() -> None:
-    __version__: str = version("kafka-mocker")
+    __version__: str = version("kafka-emulator")
 
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="Kafka Mock Messages Sender"
+        description="Kafka Messages Emulator"
     )
 
     parser.add_argument(

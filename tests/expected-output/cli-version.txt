@@ -1,1 +1,1 @@
-kafka-mocker 0.0.1
+kafka-emulator 0.0.1

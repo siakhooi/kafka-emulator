@@ -1,4 +1,4 @@
-from kafka_mocker.cli import run
+from kafka_emulator.cli import run
 
 import pytest
 
@@ -7,7 +7,7 @@ import pytest
 def test_run_help(monkeypatch, capsys, option_help):
     monkeypatch.setattr(
         "sys.argv",
-        ["kafka-mocker", option_help],
+        ["kafka-emulator", option_help],
     )
 
     with pytest.raises(SystemExit) as pytest_wrapped_e:
@@ -26,7 +26,7 @@ def test_run_help(monkeypatch, capsys, option_help):
 def test_run_show_version(monkeypatch, capsys, option_version):
     monkeypatch.setattr(
         "sys.argv",
-        ["kafka-mocker", option_version],
+        ["kafka-emulator", option_version],
     )
 
     with pytest.raises(SystemExit) as pytest_wrapped_e:
@@ -45,7 +45,7 @@ def test_run_show_version(monkeypatch, capsys, option_version):
 def test_run_wrong_options(monkeypatch, capsys, options):
     monkeypatch.setattr(
         "sys.argv",
-        ["kafka-mocker"] + options,
+        ["kafka-emulator"] + options,
     )
 
     with pytest.raises(SystemExit) as pytest_wrapped_e:
@@ -54,5 +54,5 @@ def test_run_wrong_options(monkeypatch, capsys, options):
     assert pytest_wrapped_e.value.code == 2
 
     captured = capsys.readouterr()
-    assert "usage: kafka-mocker [-h] [-v]" in captured.err
-    assert "kafka-mocker: error: unrecognized arguments:" in captured.err
+    assert "usage: kafka-emulator [-h] [-v]" in captured.err
+    assert "kafka-emulator: error: unrecognized arguments:" in captured.err

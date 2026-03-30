@@ -1,2 +1,2 @@
-usage: kafka-mocker [-h] [-v]
-kafka-mocker: error: unrecognized arguments: -p
+usage: kafka-emulator [-h] [-v]
+kafka-emulator: error: unrecognized arguments: -p

@@ -2,11 +2,11 @@ help:
 clean:
 	rm -rf dist target coverage \
 	.coverage \
-	src/kafka_mocker/__pycache__ \
+	src/kafka_emulator/__pycache__ \
 	tests/__pycache__ \
-	.pytest_cache
+	.pytest_cache  .tox
 run:
-	poetry run kafka-mocker
+	poetry run kafka-emulator
 set-version:
 	scripts/set-version.sh
 build:
@@ -20,7 +20,7 @@ update:
 test:
 	 poetry run pytest --capture=sys \
 	 --junit-xml=coverage/test-results.xml \
-	 --cov=kafka_mocker \
+	 --cov=kafka_emulator \
 	 --cov-report term-missing  \
 	 --cov-report xml:coverage/coverage.xml \
 	 --cov-report html:coverage/coverage.html \
@@ -31,13 +31,5 @@ all: clean set-version install flake8 build tox-run
 release:
 	scripts/release.sh
 
-commit:
-	scripts/git-commit.sh
-	git push
-
-fix-cert:
-	pip install pip-system-certs --trusted-host pypi.org --trusted-host files.pythonhosted.org
-fix-pyenv:
-	 pyenv versions --bare > .python-version
 tox-run:
 	tox run

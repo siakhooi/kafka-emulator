@@ -1,6 +1,6 @@
-usage: kafka-mocker [-h] [-v]
+usage: kafka-emulator [-h] [-v]
 
-Kafka Mock Messages Sender
+Kafka Messages Emulator
 
 options:
   -h, --help     show this help message and exit

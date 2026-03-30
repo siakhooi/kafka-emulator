@@ -5,4 +5,4 @@ source ./release.env
 
 sed -i 'pyproject.toml' -e 's@version = .*@version = "'"$RELEASE_VERSION"'"@g'
 
-echo "kafka-mocker $RELEASE_VERSION" > tests/expected-output/cli-version.txt
+echo "kafka-emulator $RELEASE_VERSION" > tests/expected-output/cli-version.txt

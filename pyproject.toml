@@ -1,7 +1,7 @@
 [project]
-name = "kafka_mocker"
+name = "kafka_emulator"
 version = "0.0.1"
-description = "Kafka Mock Messages Sender"
+description = "Kafka Messages Emulator"
 authors = [
     {name = "Siak Hooi",email = "siakhooi@gmail.com"}
 ]
@@ -20,17 +20,17 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/siakhooi/kafka-mocker"
-repository = "https://github.com/siakhooi/kafka-mocker"
-documentation = "https://github.com/siakhooi/kafka-mocker/wiki"
-"Bug Tracker" = "https://github.com/siakhooi/kafka-mocker/issues"
+homepage = "https://github.com/siakhooi/kafka-emulator"
+repository = "https://github.com/siakhooi/kafka-emulator"
+documentation = "https://github.com/siakhooi/kafka-emulator/wiki"
+"Bug Tracker" = "https://github.com/siakhooi/kafka-emulator/issues"
 
 [project.scripts]
-kafka-mocker = 'kafka_mocker.cli:run'
+kafka-emulator = 'kafka_emulator.cli:run'
 
 
 [tool.poetry]
-packages = [{include = "kafka_mocker", from = "src"}]
+packages = [{include = "kafka_emulator", from = "src"}]
 
 
 [tool.poetry.group.dev.dependencies]
