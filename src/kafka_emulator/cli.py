@@ -6,6 +6,7 @@ from importlib.metadata import version
 from pathlib import Path
 
 import yaml
+from jinja2 import Template
 from kafka import KafkaProducer
 
 
@@ -34,9 +35,18 @@ def parse_duration(duration_str: str) -> float:
     return value / 1000
 
 
+def render_template(value: str, context: dict) -> str:
+    """Render a string value as a Jinja template using the context."""
+    if value is None:
+        return None
+    template = Template(str(value))
+    return template.render(context)
+
+
 def run_scenario(scenario_path: str) -> None:
     """Run a scenario from a YAML file."""
     scenario_dir = Path(scenario_path).parent
+    context = {}
 
     with open(scenario_path, "r") as f:
         scenario = yaml.safe_load(f)
@@ -55,21 +65,32 @@ def run_scenario(scenario_path: str) -> None:
     try:
         steps = scenario.get("steps", [])
         for step in steps:
-            if "send" in step:
+            if "set" in step:
+                set_config = step["set"]
+                if set_config:
+                    for key, value in set_config.items():
+                        rendered_value = render_template(str(value), context)
+                        context[key] = rendered_value
+
+            elif "send" in step:
                 send_config = step["send"]
                 topic = send_config.get("topic")
                 key = send_config.get("key")
+                if key is not None:
+                    key = render_template(str(key), context)
                 headers_dict = send_config.get("headers", {})
                 body_file = send_config.get("body")
 
                 body_path = scenario_dir / body_file
                 with open(body_path, "r") as f:
-                    body = f.read()
+                    body_content = f.read()
+                body = render_template(body_content, context)
 
                 headers = None
                 if headers_dict:
                     headers = [
-                        (k, v.encode("utf-8")) for k, v in headers_dict.items()
+                        (k, render_template(str(v), context).encode("utf-8"))
+                        for k, v in headers_dict.items()
                     ]
 
                 producer.send(
@@ -84,6 +105,8 @@ def run_scenario(scenario_path: str) -> None:
             elif "sleep" in step:
                 sleep_config = step["sleep"]
                 message = sleep_config.get("message")
+                if message:
+                    message = render_template(str(message), context)
                 duration_str = sleep_config.get("duration", "0ms")
 
                 if message:

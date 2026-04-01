@@ -3,6 +3,11 @@ kafka:
     bootstrap_servers: "kafka-test:9092"
 
 steps:
+  - set:
+      user_id: abc
+      order_id: 22222
+  - set:
+      run_id: "{{ user_id }}-{{ order_id }}"
   - send:
       topic: "test-topic"
       body: "message1.json"
@@ -11,8 +16,14 @@ steps:
         header1: value1
         header2: value2
   - sleep:
-      message: "Waiting 500ms"
+      message: "Waiting {{ order_id }} 500ms"  # renders to "Waiting 22222 500ms"
       duration: 500ms
   - send:
       topic: "test-topic"
       body: "message2.json"
+  - send:
+      topic: "test-topic"
+      key: "{{ user_id }}"  # renders to "abc"
+      headers:
+        x-user: "{{ user_id }}"  # renders to "abc"
+      body: "message3.json"  # file content also rendered as Jinja template
