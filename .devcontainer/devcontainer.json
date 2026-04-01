@@ -26,5 +26,8 @@
 	],
 	"remoteEnv": {
 		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
-	}
+	},
+	"initializeCommand": "docker network inspect kafka-emulator >/dev/null 2>&1 || docker network create kafka-emulator",
+	"postStartCommand": "sudo chmod 666 /var/run/docker.sock || true",
+	"runArgs": ["--network=kafka-emulator"]
 }

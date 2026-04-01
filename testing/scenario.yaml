@@ -1,0 +1,18 @@
+kafka:
+  default:
+    bootstrap_servers: "kafka-test:9092"
+
+steps:
+  - send:
+      topic: "test-topic"
+      body: "message1.json"
+      key: xxxxx
+      headers:
+        header1: value1
+        header2: value2
+  - sleep:
+      message: "Waiting 500ms"
+      duration: 500ms
+  - send:
+      topic: "test-topic"
+      body: "message2.json"

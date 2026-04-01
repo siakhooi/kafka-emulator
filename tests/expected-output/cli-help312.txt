@@ -5,5 +5,5 @@ Kafka Messages Emulator
 options:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
-  -s, --scenario SCENARIO
+  -s SCENARIO, --scenario SCENARIO
                         Path to scenario YAML file

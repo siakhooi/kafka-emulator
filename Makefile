@@ -5,8 +5,16 @@ clean:
 	src/kafka_emulator/__pycache__ \
 	tests/__pycache__ \
 	.pytest_cache  .tox
-run:
-	poetry run kafka-emulator
+run-help:
+	poetry run kafka-emulator -h
+run-scenario:
+	poetry run kafka-emulator -s testing/scenario.yaml
+kafka-up:
+	cd testing && docker compose up -d
+kafka-down:
+	cd testing && docker compose down
+kafka-consume:
+	docker exec kafka-test /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning --property print.key=true --property print.headers=true
 set-version:
 	scripts/set-version.sh
 build:
