@@ -12,9 +12,15 @@ def now() -> str:
     return datetime.datetime.now().isoformat()
 
 
+def epoch() -> int:
+    """Return the current time as a Unix timestamp."""
+    return int(datetime.datetime.now().timestamp())
+
+
 def get_template_helpers() -> dict[str, callable]:
     """Return the map of template helper names to callable functions."""
     return {
         "uuid": generate_uuid,
         "now": now,
+        "epoch": epoch,
     }
