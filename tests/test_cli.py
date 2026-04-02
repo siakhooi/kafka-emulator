@@ -1,6 +1,9 @@
+import datetime
 import sys
+import uuid
 
-from kafka_emulator.cli import run
+from kafka_emulator.cli import render_template, run
+from kafka_emulator.template_helpers import get_template_helpers
 
 import pytest
 
@@ -85,3 +88,25 @@ def test_run_wrong_options(monkeypatch, capsys, options):
     captured = capsys.readouterr()
     assert "usage: kafka-emulator [-h] [-v] [-s SCENARIO]" in captured.err
     assert "kafka-emulator: error: unrecognized arguments:" in captured.err
+
+
+def test_render_template_helpers_uuid_and_now():
+    rendered_uuid = render_template("{{ uuid() }}", {})
+    assert isinstance(rendered_uuid, str)
+    assert rendered_uuid
+    assert len(rendered_uuid) >= 32
+
+    uuid_obj = uuid.UUID(rendered_uuid)
+    assert str(uuid_obj) == rendered_uuid
+
+    rendered_now = render_template("{{ now() }}", {})
+    assert isinstance(rendered_now, str)
+    datetime.datetime.fromisoformat(rendered_now)
+
+
+def test_template_helpers_are_exposed_via_map():
+    helpers = get_template_helpers()
+    assert "uuid" in helpers
+    assert callable(helpers["uuid"])
+    assert "now" in helpers
+    assert callable(helpers["now"])

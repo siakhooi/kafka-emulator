@@ -4,8 +4,9 @@ kafka:
 
 steps:
   - set:
-      user_id: abc
-      order_id: 22222
+      user_id: "{{ uuid() }}"
+      order_id: "{{ uuid() }}"
+      order_date: "{{ now() }}"
   - set:
       run_id: "{{ user_id }}-{{ order_id }}"
   - send:

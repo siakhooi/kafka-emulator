@@ -9,6 +9,8 @@ import yaml
 from jinja2 import Template
 from kafka import KafkaProducer
 
+from kafka_emulator.template_helpers import get_template_helpers
+
 
 def print_to_stderr_and_exit(e: Exception, exit_code: int) -> None:
     print(f"Error: {e}", file=sys.stderr)
@@ -40,7 +42,8 @@ def render_template(value: str, context: dict) -> str:
     if value is None:
         return None
     template = Template(str(value))
-    return template.render(context)
+    render_context = {**context, **get_template_helpers()}
+    return template.render(**render_context)
 
 
 def run_scenario(scenario_path: str) -> None:

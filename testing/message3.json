@@ -1,5 +1,6 @@
 {
     "user_id": "{{ user_id }}",
     "order_id": "{{ order_id }}",
+    "order_date": "{{ order_date }}",
     "run_id": "{{ run_id }}"
 }
