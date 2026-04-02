@@ -12,14 +12,15 @@ pip install kafka_emulator
 
 ```
 $ kafka-emulator -h
-usage: kafka-emulator [-h] [-v]
+usage: kafka-emulator [-h] [-v] [-s SCENARIO]
 
 Kafka Messages Emulator
 
 options:
-  -h, --help     show this help message and exit
-  -v, --version  show program's version number and exit
-
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  -s, --scenario SCENARIO
+                        Path to scenario YAML file
 ```
 
 ## Links
