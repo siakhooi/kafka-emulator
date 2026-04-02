@@ -1,4 +1,9 @@
 {
     "time": "{{ epoch() }}",
+    "color": "{{ ['red', 'green', 'blue'] | random }}",
+    "randomInt1": {{ range(1, 101) | random }},
+    "randomText1": {{ lipsum() }},
+    "randomText2": {{ lipsum(n=2) }},
+    "randomText3": {{ lipsum(html=False, n=2) }},
     "test": "test1"
 }
