@@ -1,3 +1,5 @@
+name: Submit Order AAA
+
 kafka:
   default:
     bootstrap_servers: "kafka-test:9092"
@@ -7,8 +9,6 @@ steps:
       user_id: "{{ uuid() }}"
       order_id: "{{ uuid() }}"
       order_date: "{{ now() }}"
-  - set:
-      run_id: "{{ user_id }}-{{ order_id }}"
   - send:
       topic: "test-topic"
       body: "message1-text.json"
@@ -34,3 +34,9 @@ steps:
       headers:
         x-user: "{{ user_id }}"
       body: "message4-random.json"
+  - send:
+      topic: "test-topic"
+      key: "{{ user_id }}"
+      headers:
+        x-user: "{{ user_id }}"
+      body: "message5-meta.json"

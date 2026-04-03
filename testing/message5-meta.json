@@ -1,0 +1,6 @@
+{
+    "scenario_name": "{{ scenario_name }}",
+    "run_name": "{{ run_name }}",
+    "run_datetime": "{{ run_datetime }}",
+    "run_id": "{{ run_id }}"
+}

@@ -5,6 +5,7 @@ clean:
 	src/kafka_emulator/__pycache__ \
 	tests/__pycache__ \
 	.pytest_cache  .tox
+run: run-scenario
 run-help:
 	poetry run kafka-emulator -h
 run-scenario:

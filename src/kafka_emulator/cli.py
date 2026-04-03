@@ -1,7 +1,9 @@
 import argparse
+import datetime
 import re
 import sys
 import time
+import uuid
 from importlib.metadata import version
 from pathlib import Path
 
@@ -49,10 +51,26 @@ def render_template(value: str, context: dict) -> str:
 def run_scenario(scenario_path: str) -> None:
     """Run a scenario from a YAML file."""
     scenario_dir = Path(scenario_path).parent
-    context = {}
 
     with open(scenario_path, "r") as f:
         scenario = yaml.safe_load(f)
+
+    scenario_name = scenario.get("name", "unnamed")
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
+    run_datetime = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+    scenario_name_normalized = re.sub(
+        r"[^a-z0-9]+", "_", scenario_name.lower()
+    ).strip("_")
+    run_datetime_short = now_utc.strftime("%Y%m%d_%H%M%S")
+    run_name = f"{scenario_name_normalized}_{run_datetime_short}"
+    run_id = str(uuid.uuid4())
+
+    context = {
+        "scenario_name": scenario_name,
+        "run_name": run_name,
+        "run_datetime": run_datetime,
+        "run_id": run_id,
+    }
 
     kafka_config = scenario.get("kafka", {}).get("default", {})
     bootstrap_servers = kafka_config.get("bootstrap_servers", "localhost:9092")
