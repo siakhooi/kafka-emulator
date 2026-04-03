@@ -1,4 +1,5 @@
 import datetime
+import random
 import uuid
 
 
@@ -17,10 +18,18 @@ def epoch() -> int:
     return int(datetime.datetime.now().timestamp())
 
 
+def epoch_ms() -> int:
+    """Return the current time as a Unix timestamp in milliseconds."""
+    return int(datetime.datetime.now().timestamp() * 1000)
+
+
 def get_template_helpers() -> dict[str, callable]:
     """Return the map of template helper names to callable functions."""
     return {
         "uuid": generate_uuid,
         "now": now,
         "epoch": epoch,
+        "epoch_ms": epoch_ms,
+        "randint": random.randint,
+        "choice": random.choice,
     }

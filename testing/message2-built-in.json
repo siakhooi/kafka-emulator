@@ -1,0 +1,10 @@
+{
+    "upper": "{{ 'test' | upper }}",
+    "lower": "{{ 'tEst' | lower }}",
+    "default": "{{ test | default('default_value') }}",
+    "replace": "{{ 'hello world' | replace('world', 'kafka') }}",
+    "length": "{{ 'hello' | length }}",
+    "arrayLength": "{{ [1, 2, 3] | length }}",
+    "join": "{{ ['a', 'b', 'c'] | join(',') }}",
+    "trim": "{{ '  hello  ' | trim }}"
+}

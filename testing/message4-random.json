@@ -1,0 +1,4 @@
+{
+    "randint": "{{ randint(1, 100) }}",
+    "choice": "{{ choice(['a', 'b', 'c']) }}"
+}

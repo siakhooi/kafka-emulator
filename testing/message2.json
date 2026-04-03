@@ -1,4 +1,0 @@
-{
-    "time": "{{ epoch() }}",
-    "test": "test2"
-}
