@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import re
+import select
 import sys
 import time
 import uuid
@@ -37,6 +38,37 @@ def parse_duration(duration_str: str) -> float:
     elif unit == "h":
         return value * 3600
     return value / 1000
+
+
+def wait_for_keypress(timeout: float | None) -> None:
+    """Wait for a keypress with optional timeout."""
+    if not sys.stdin.isatty():
+        if timeout:
+            time.sleep(timeout)
+        return
+
+    try:
+        import termios
+        import tty
+
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            if timeout:
+                ready, _, _ = select.select([sys.stdin], [], [], timeout)
+                if ready:
+                    sys.stdin.read(1)
+            else:
+                sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            print()
+    except (ImportError, OSError):
+        if timeout:
+            time.sleep(timeout)
+        else:
+            input()
 
 
 def render_template(value: str, context: dict) -> str:
@@ -135,6 +167,24 @@ def run_scenario(scenario_path: str) -> None:
 
                 duration_seconds = parse_duration(duration_str)
                 time.sleep(duration_seconds)
+
+            elif "pause" in step:
+                pause_config = step["pause"]
+                message = pause_config.get("message")
+                if message:
+                    message = render_template(str(message), context)
+                timeout_str = pause_config.get("timeout")
+
+                if message:
+                    print(message)
+
+                if timeout_str:
+                    timeout_seconds = parse_duration(timeout_str)
+                    print(f"Press any key (timeout: {timeout_str})...")
+                    wait_for_keypress(timeout_seconds)
+                else:
+                    print("Press any key to continue...")
+                    wait_for_keypress(None)
 
     finally:
         producer.close()

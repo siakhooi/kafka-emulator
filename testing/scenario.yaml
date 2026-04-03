@@ -28,12 +28,17 @@ steps:
       headers:
         x-user: "{{ user_id }}"
       body: "message3-helpers.json"
+  - pause:
+      message: "Waiting for messages to be processed {{ order_id }}"
+      timeout: 5s
   - send:
       topic: "test-topic"
       key: "{{ user_id }}"
       headers:
         x-user: "{{ user_id }}"
       body: "message4-random.json"
+  - pause:
+      message: "Waiting for messages to be processed {{ order_id }}"
   - send:
       topic: "test-topic"
       key: "{{ user_id }}"
