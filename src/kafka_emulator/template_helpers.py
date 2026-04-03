@@ -23,6 +23,12 @@ def epoch_ms() -> int:
     return int(datetime.datetime.now().timestamp() * 1000)
 
 
+def random_string(length: int = 8) -> str:
+    """Return a random string of the specified length."""
+    letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return "".join(random.choice(letters) for _ in range(length))
+
+
 def get_template_helpers() -> dict[str, callable]:
     """Return the map of template helper names to callable functions."""
     return {
@@ -32,4 +38,5 @@ def get_template_helpers() -> dict[str, callable]:
         "epoch_ms": epoch_ms,
         "randint": random.randint,
         "choice": random.choice,
+        "random_string": random_string,
     }
