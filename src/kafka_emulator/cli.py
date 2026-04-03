@@ -13,31 +13,12 @@ from jinja2 import Template
 from kafka import KafkaProducer
 
 from kafka_emulator.template_helpers import get_template_helpers
+from kafka_emulator.duration import parse_duration
 
 
 def print_to_stderr_and_exit(e: Exception, exit_code: int) -> None:
     print(f"Error: {e}", file=sys.stderr)
     exit(exit_code)
-
-
-def parse_duration(duration_str: str) -> float:
-    """Parse duration string (e.g., '500ms', '1s', '2m') to seconds."""
-    match = re.match(r"^(\d+(?:\.\d+)?)\s*(ms|s|m|h)?$", duration_str.strip())
-    if not match:
-        raise ValueError(f"Invalid duration format: {duration_str}")
-
-    value = float(match.group(1))
-    unit = match.group(2) or "ms"
-
-    if unit == "ms":
-        return value / 1000
-    elif unit == "s":
-        return value
-    elif unit == "m":
-        return value * 60
-    elif unit == "h":
-        return value * 3600
-    return value / 1000
 
 
 def wait_for_keypress(timeout: float | None) -> None:
