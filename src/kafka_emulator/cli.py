@@ -70,7 +70,7 @@ def wait_for_keypress(timeout: float | None) -> None:
             input()
 
 
-def render_template(value: str, context: dict) -> str:
+def render_template(value: str | None, context: dict) -> str | None:
     """Render a string value as a Jinja template using the context."""
     if value is None:
         return None
