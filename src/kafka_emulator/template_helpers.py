@@ -48,6 +48,13 @@ def date_add(
     return result.isoformat()
 
 
+def dt_format(value: datetime.datetime | str, fmt: str) -> str:
+    """Format a datetime value using the specified format string."""
+    if isinstance(value, str):
+        value = datetime.datetime.fromisoformat(value)
+    return value.strftime(fmt)
+
+
 def random_string(length: int = 8) -> str:
     """Return a random string of the specified length."""
     letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -102,4 +109,5 @@ def get_template_helpers() -> dict[str, callable]:
         "sha256": sha256,
         "urlencode": urlencode,
         "urldecode": urldecode,
+        "dt_format": dt_format,
     }

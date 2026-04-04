@@ -4,6 +4,7 @@
   "now": "{{ now() }}",
   "today": "{{ today() }}",
   "date_add": "{{ date_add(now(), days=10, hours=3, minutes=30, seconds=40, weeks=4) }}",
+  "dt_format": "{{ dt_format(now(), '%Y-%m-%d %H:%M:%S') }}",
   "b64encode": "{{ b64encode('hello world') }}",
   "b64decode1": "{{ b64decode('aGVsbG8gZWFydGg=') }}",
   "b64decode2": "{{ b64decode('aGVsbG8gZWFydGgK') | trim }}",
