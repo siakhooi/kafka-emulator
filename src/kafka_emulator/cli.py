@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import json
 import re
 import select
 import sys
@@ -123,6 +124,11 @@ def run_scenario(scenario_path: str) -> None:
                 with open(body_path, "r") as f:
                     body_content = f.read()
                 body = render_template(body_content, context)
+
+                try:
+                    body = json.dumps(json.loads(body), separators=(",", ":"))
+                except (json.JSONDecodeError, ValueError):
+                    pass
 
                 headers = None
                 if headers_dict:

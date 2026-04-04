@@ -56,3 +56,6 @@ steps:
         seq: "{{ seq() }}"
         x-user: "{{ user_id }}"
       body: "message5-meta.json"
+  - send:
+      topic: "test-topic"
+      body: "message6.txt"
