@@ -11,9 +11,10 @@ import pytest
 @pytest.mark.parametrize("option_help", ["-h", "--help"])
 @pytest.mark.skipif(
     sys.version_info < (3, 13),
-    reason="Help output format differs in Python < 3.13"
+    reason="Help output format differs in Python < 3.13",
 )
 def test_run_help(monkeypatch, capsys, option_help):
+    monkeypatch.setenv("COLUMNS", "80")
     monkeypatch.setattr(
         "sys.argv",
         ["kafka-emulator", option_help],
@@ -34,9 +35,10 @@ def test_run_help(monkeypatch, capsys, option_help):
 @pytest.mark.parametrize("option_help", ["-h", "--help"])
 @pytest.mark.skipif(
     sys.version_info >= (3, 13),
-    reason="Help output format differs in Python >= 3.13"
+    reason="Help output format differs in Python >= 3.13",
 )
 def test_run_help312(monkeypatch, capsys, option_help):
+    monkeypatch.setenv("COLUMNS", "80")
     monkeypatch.setattr(
         "sys.argv",
         ["kafka-emulator", option_help],

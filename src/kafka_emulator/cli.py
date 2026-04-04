@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import json
+import logging
 import re
 import select
 import signal
@@ -20,6 +21,8 @@ from kafka_emulator.duration import parse_duration
 from kafka_emulator.models import Scenario
 
 colorama_init()
+
+logger = logging.getLogger("kafka_emulator")
 
 COLOR_GREEN = Fore.GREEN
 COLOR_CYAN = Fore.CYAN
@@ -75,11 +78,13 @@ def render_template(value: str, context: dict) -> str:
 def run_scenario(scenario_path: str) -> None:
     """Run a scenario from a YAML file."""
     scenario_dir = Path(scenario_path).parent
+    logger.info("Loading scenario from %s", scenario_path)
 
     with open(scenario_path, "r") as f:
         raw = yaml.safe_load(f)
 
     scenario = Scenario(**raw)
+    logger.debug("Scenario validated: %s", scenario.name)
 
     scenario_name = scenario.name
     now_utc = datetime.datetime.now(datetime.timezone.utc)
@@ -97,10 +102,14 @@ def run_scenario(scenario_path: str) -> None:
         "run_datetime": run_datetime,
         "run_id": run_id,
     }
+    logger.debug("Context: %s", context)
 
     default_headers = scenario.defaults.headers
+    if default_headers:
+        logger.debug("Default headers: %s", default_headers)
 
     bootstrap_servers = scenario.kafka.default.bootstrap_servers
+    logger.info("Connecting to Kafka at %s", bootstrap_servers)
 
     producer = KafkaProducer(
         bootstrap_servers=bootstrap_servers,
@@ -116,6 +125,7 @@ def run_scenario(scenario_path: str) -> None:
         nonlocal shutdown_requested
         shutdown_requested = True
         sig_name = signal.Signals(signum).name
+        logger.warning("%s received, shutting down...", sig_name)
         print(
             f"\n{COLOR_YELLOW}[SHUTDOWN]{COLOR_RESET}"
             f" {sig_name} received, shutting down..."
@@ -129,12 +139,14 @@ def run_scenario(scenario_path: str) -> None:
     try:
         for step in scenario.steps:
             if shutdown_requested:
+                logger.info("Shutdown requested, stopping")
                 break
             if step.set is not None:
                 set_config = step.set
                 for key, value in set_config.items():
                     rendered_value = render_template(str(value), context)
                     context[key] = rendered_value
+                    logger.debug("Set %s = %s", key, rendered_value)
                     print(
                         f"{COLOR_CYAN}[SET]{COLOR_RESET}"
                         f" {key} = {rendered_value}"
@@ -151,6 +163,7 @@ def run_scenario(scenario_path: str) -> None:
                 body_file = send_config.body
 
                 body_path = scenario_dir / body_file
+                logger.debug("Loading body from %s", body_path)
                 with open(body_path, "r") as f:
                     body_content = f.read()
                 body = render_template(body_content, context)
@@ -174,6 +187,13 @@ def run_scenario(scenario_path: str) -> None:
                     headers=headers,
                 )
                 producer.flush()
+                logger.info(
+                    "Sent to topic '%s' key='%s'",
+                    topic,
+                    key,
+                )
+                logger.debug("Body: %s", body)
+                logger.debug("Headers: %s", headers)
                 print(
                     f"{COLOR_GREEN}[SEND]{COLOR_RESET}"
                     f" Sent message to topic '{topic}'"
@@ -196,6 +216,7 @@ def run_scenario(scenario_path: str) -> None:
                     )
 
                 duration_seconds = parse_duration(duration_str)
+                logger.debug("Sleeping for %s seconds", duration_seconds)
                 time.sleep(duration_seconds)
 
             elif step.pause is not None:
@@ -231,6 +252,7 @@ def run_scenario(scenario_path: str) -> None:
                     wait_for_keypress(None)
 
     finally:
+        logger.info("Flushing and closing Kafka producer")
         producer.flush()
         producer.close()
         signal.signal(signal.SIGINT, original_sigint)
@@ -252,7 +274,29 @@ def run() -> None:
         "-s", "--scenario", type=str, help="Path to scenario YAML file"
     )
 
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug logging",
+    )
+
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Set log level (default: INFO)",
+    )
+
     args = parser.parse_args()
+
+    log_level = "DEBUG" if args.debug else args.log_level
+    logging.basicConfig(
+        level=getattr(logging, log_level),
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S",
+    )
+    logger.debug("Log level set to %s", log_level)
 
     if args.scenario:
         try:
