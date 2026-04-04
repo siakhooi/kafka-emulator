@@ -1,3 +1,4 @@
+import base64
 import datetime
 import random
 import uuid
@@ -51,6 +52,16 @@ def random_string(length: int = 8) -> str:
     return "".join(random.choice(letters) for _ in range(length))
 
 
+def b64encode(value: str) -> str:
+    """Return the base64-encoded version of the input string."""
+    return base64.b64encode(value.encode("utf-8")).decode("utf-8")
+
+
+def b64decode(value: str) -> str:
+    """Return the base64-decoded version of the input string."""
+    return base64.b64decode(value).decode("utf-8")
+
+
 def get_template_helpers() -> dict[str, callable]:
     """Return the map of template helper names to callable functions."""
     return {
@@ -63,4 +74,6 @@ def get_template_helpers() -> dict[str, callable]:
         "randint": random.randint,
         "choice": random.choice,
         "random_string": random_string,
+        "b64encode": b64encode,
+        "b64decode": b64decode,
     }
