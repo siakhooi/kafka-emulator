@@ -10,11 +10,20 @@ from importlib.metadata import version
 from pathlib import Path
 
 import yaml
+from colorama import Fore, Style, init as colorama_init
 from jinja2 import Template
 from kafka import KafkaProducer
 
 from kafka_emulator.template_helpers import get_template_helpers
 from kafka_emulator.duration import parse_duration
+
+colorama_init()
+
+COLOR_GREEN = Fore.GREEN
+COLOR_CYAN = Fore.CYAN
+COLOR_YELLOW = Fore.YELLOW
+COLOR_MAGENTA = Fore.MAGENTA
+COLOR_RESET = Style.RESET_ALL
 
 
 def print_to_stderr_and_exit(e: Exception, exit_code: int) -> None:
@@ -45,7 +54,6 @@ def wait_for_keypress(timeout: float | None) -> None:
                 sys.stdin.read(1)
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-            print()
     except (ImportError, OSError):
         if timeout:
             time.sleep(timeout)
@@ -109,6 +117,10 @@ def run_scenario(scenario_path: str) -> None:
                     for key, value in set_config.items():
                         rendered_value = render_template(str(value), context)
                         context[key] = rendered_value
+                        print(
+                            f"{COLOR_CYAN}[SET]{COLOR_RESET}"
+                            f" {key} = {rendered_value}"
+                        )
 
             elif "send" in step:
                 send_config = step["send"]
@@ -144,7 +156,11 @@ def run_scenario(scenario_path: str) -> None:
                     headers=headers,
                 )
                 producer.flush()
-                print(f"Sent message to topic '{topic}' with key '{key}'")
+                print(
+                    f"{COLOR_GREEN}[SEND]{COLOR_RESET}"
+                    f" Sent message to topic '{topic}'"
+                    f" with key '{key}'"
+                )
 
             elif "sleep" in step:
                 sleep_config = step["sleep"]
@@ -154,7 +170,12 @@ def run_scenario(scenario_path: str) -> None:
                 duration_str = sleep_config.get("duration", "0ms")
 
                 if message:
-                    print(message)
+                    print(f"{COLOR_YELLOW}[SLEEP]{COLOR_RESET}" f" {message}")
+                else:
+                    print(
+                        f"{COLOR_YELLOW}[SLEEP]{COLOR_RESET}"
+                        f" {duration_str}"
+                    )
 
                 duration_seconds = parse_duration(duration_str)
                 time.sleep(duration_seconds)
@@ -166,15 +187,29 @@ def run_scenario(scenario_path: str) -> None:
                     message = render_template(str(message), context)
                 timeout_str = pause_config.get("timeout")
 
-                if message:
-                    print(message)
-
                 if timeout_str:
                     timeout_seconds = parse_duration(timeout_str)
-                    print(f"Press any key (timeout: {timeout_str})...")
+                    if message:
+                        print(
+                            f"{COLOR_MAGENTA}[PAUSE]{COLOR_RESET}"
+                            f" {message}"
+                        )
+                    print(
+                        f"{COLOR_MAGENTA}[PAUSE]{COLOR_RESET}"
+                        f" Press any key"
+                        f" (timeout: {timeout_str})..."
+                    )
                     wait_for_keypress(timeout_seconds)
                 else:
-                    print("Press any key to continue...")
+                    if message:
+                        print(
+                            f"{COLOR_MAGENTA}[PAUSE]{COLOR_RESET}"
+                            f" {message}"
+                        )
+                    print(
+                        f"{COLOR_MAGENTA}[PAUSE]{COLOR_RESET}"
+                        f" Press any key to continue..."
+                    )
                     wait_for_keypress(None)
 
     finally:
