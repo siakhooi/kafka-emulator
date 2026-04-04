@@ -9,7 +9,6 @@
 		"vscode": {
 			"extensions": [
 				"lfm.vscode-makefile-term",
-				"es6kr.vscode-makefile-term",
 				"ms-python.python",
 				"ms-python.debugpy",
 				"ms-python.black-formatter",
