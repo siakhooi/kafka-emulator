@@ -97,6 +97,134 @@ def _build_run_context(scenario_name: str) -> dict:
     }
 
 
+def _handle_set(step, context):
+    """Handle a set step."""
+    for key, value in step.set.items():
+        rendered_value = render_template(str(value), context)
+        context[key] = rendered_value
+        logger.debug("Set %s = %s", key, rendered_value)
+        _print_step(
+            "SET",
+            COLOR_CYAN,
+            f"{key} = {rendered_value}",
+        )
+
+
+def _handle_send(
+    step,
+    context,
+    default_headers,
+    scenario_dir,
+    producer,
+):
+    """Handle a send step."""
+    send_config = step.send
+    topic = send_config.topic
+    key = send_config.key
+    if key is not None:
+        key = render_template(str(key), context)
+    step_headers = send_config.headers
+    headers_dict = {**default_headers, **step_headers}
+    body_file = send_config.body
+
+    body_path = scenario_dir / body_file
+    logger.debug("Loading body from %s", body_path)
+    with open(body_path, "r") as f:
+        body_content = f.read()
+    body = render_template(body_content, context)
+
+    try:
+        body = json.dumps(json.loads(body), separators=(",", ":"))
+    except (json.JSONDecodeError, ValueError):
+        pass
+
+    headers = None
+    if headers_dict:
+        headers = [
+            (k, render_template(str(v), context).encode("utf-8"))
+            for k, v in headers_dict.items()
+        ]
+
+    producer.send(
+        topic=topic,
+        key=key,
+        value=body,
+        headers=headers,
+    )
+    producer.flush()
+    logger.debug(
+        "Sent to topic '%s' key='%s'",
+        topic,
+        key,
+    )
+    logger.debug("Body: %s", body)
+    logger.debug("Headers: %s", headers)
+    _print_step(
+        "SEND",
+        COLOR_GREEN,
+        f"Sent message to topic '{topic}'" f" with key '{key}'",
+    )
+
+
+def _handle_sleep(step, context):
+    """Handle a sleep step."""
+    sleep_config = step.sleep
+    message = sleep_config.message
+    if message:
+        message = render_template(str(message), context)
+    duration_str = sleep_config.duration
+
+    if message:
+        _print_step("SLEEP", COLOR_YELLOW, message)
+    else:
+        _print_step(
+            "SLEEP",
+            COLOR_YELLOW,
+            duration_str,
+        )
+
+    duration_seconds = parse_duration(duration_str)
+    logger.debug("Sleeping for %s seconds", duration_seconds)
+    time.sleep(duration_seconds)
+
+
+def _handle_pause(step, context):
+    """Handle a pause step."""
+    pause_config = step.pause
+    message = pause_config.message
+    if message:
+        message = render_template(str(message), context)
+    timeout_str = pause_config.timeout
+
+    if timeout_str:
+        timeout_seconds = parse_duration(timeout_str)
+        if message:
+            _print_step(
+                "PAUSE",
+                COLOR_MAGENTA,
+                message,
+            )
+        _print_step(
+            "PAUSE",
+            COLOR_MAGENTA,
+            f"Press any key (timeout: {timeout_str})...",
+        )
+        wait_for_keypress(timeout_seconds)
+    else:
+        if message:
+            _print_step(
+                "PAUSE",
+                COLOR_MAGENTA,
+                message,
+            )
+        _print_step(
+            "PAUSE",
+            COLOR_MAGENTA,
+            "Press any key to continue...",
+        )
+        wait_for_keypress(None)
+
+
 def run_scenario(scenario_path: str) -> None:
     """Run a scenario from a YAML file."""
     scenario_dir = Path(scenario_path).parent
@@ -151,119 +279,19 @@ def run_scenario(scenario_path: str) -> None:
                 logger.info("Shutdown requested, stopping")
                 break
             if step.set is not None:
-                set_config = step.set
-                for key, value in set_config.items():
-                    rendered_value = render_template(str(value), context)
-                    context[key] = rendered_value
-                    logger.debug("Set %s = %s", key, rendered_value)
-                    _print_step(
-                        "SET",
-                        COLOR_CYAN,
-                        f"{key} = {rendered_value}",
-                    )
-
+                _handle_set(step, context)
             elif step.send is not None:
-                send_config = step.send
-                topic = send_config.topic
-                key = send_config.key
-                if key is not None:
-                    key = render_template(str(key), context)
-                step_headers = send_config.headers
-                headers_dict = {**default_headers, **step_headers}
-                body_file = send_config.body
-
-                body_path = scenario_dir / body_file
-                logger.debug("Loading body from %s", body_path)
-                with open(body_path, "r") as f:
-                    body_content = f.read()
-                body = render_template(body_content, context)
-
-                try:
-                    body = json.dumps(json.loads(body), separators=(",", ":"))
-                except (json.JSONDecodeError, ValueError):
-                    pass
-
-                headers = None
-                if headers_dict:
-                    headers = [
-                        (k, render_template(str(v), context).encode("utf-8"))
-                        for k, v in headers_dict.items()
-                    ]
-
-                producer.send(
-                    topic=topic,
-                    key=key,
-                    value=body,
-                    headers=headers,
+                _handle_send(
+                    step,
+                    context,
+                    default_headers,
+                    scenario_dir,
+                    producer,
                 )
-                producer.flush()
-                logger.debug(
-                    "Sent to topic '%s' key='%s'",
-                    topic,
-                    key,
-                )
-                logger.debug("Body: %s", body)
-                logger.debug("Headers: %s", headers)
-                _print_step(
-                    "SEND",
-                    COLOR_GREEN,
-                    f"Sent message to topic '{topic}'" f" with key '{key}'",
-                )
-
             elif step.sleep is not None:
-                sleep_config = step.sleep
-                message = sleep_config.message
-                if message:
-                    message = render_template(str(message), context)
-                duration_str = sleep_config.duration
-
-                if message:
-                    _print_step("SLEEP", COLOR_YELLOW, message)
-                else:
-                    _print_step(
-                        "SLEEP",
-                        COLOR_YELLOW,
-                        duration_str,
-                    )
-
-                duration_seconds = parse_duration(duration_str)
-                logger.debug("Sleeping for %s seconds", duration_seconds)
-                time.sleep(duration_seconds)
-
+                _handle_sleep(step, context)
             elif step.pause is not None:
-                pause_config = step.pause
-                message = pause_config.message
-                if message:
-                    message = render_template(str(message), context)
-                timeout_str = pause_config.timeout
-
-                if timeout_str:
-                    timeout_seconds = parse_duration(timeout_str)
-                    if message:
-                        _print_step(
-                            "PAUSE",
-                            COLOR_MAGENTA,
-                            message,
-                        )
-                    _print_step(
-                        "PAUSE",
-                        COLOR_MAGENTA,
-                        f"Press any key (timeout: {timeout_str})...",
-                    )
-                    wait_for_keypress(timeout_seconds)
-                else:
-                    if message:
-                        _print_step(
-                            "PAUSE",
-                            COLOR_MAGENTA,
-                            message,
-                        )
-                    _print_step(
-                        "PAUSE",
-                        COLOR_MAGENTA,
-                        "Press any key to continue...",
-                    )
-                    wait_for_keypress(None)
+                _handle_pause(step, context)
 
     finally:
         logger.info("Flushing and closing Kafka producer")
