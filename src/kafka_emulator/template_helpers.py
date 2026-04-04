@@ -28,6 +28,22 @@ def epoch_ms() -> int:
     return int(datetime.datetime.now().timestamp() * 1000)
 
 
+def date_add(
+    base: datetime.datetime | str,
+    days: int = 0,
+    hours: int = 0,
+    minutes: int = 0,
+    seconds: int = 0,
+) -> str:
+    """Return a new datetime with the specified offset."""
+    if isinstance(base, str):
+        base = datetime.datetime.fromisoformat(base)
+    result = base + datetime.timedelta(
+        days=days, hours=hours, minutes=minutes, seconds=seconds
+    )
+    return result.isoformat()
+
+
 def random_string(length: int = 8) -> str:
     """Return a random string of the specified length."""
     letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -41,8 +57,9 @@ def get_template_helpers() -> dict[str, callable]:
         "now": now,
         "epoch": epoch,
         "epoch_ms": epoch_ms,
+        "today": today,
+        "date_add": date_add,
         "randint": random.randint,
         "choice": random.choice,
         "random_string": random_string,
-        "today": today,
     }

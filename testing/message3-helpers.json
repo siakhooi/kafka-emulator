@@ -3,6 +3,7 @@
     "time_ms": "{{ epoch_ms() }}",
     "now": "{{ now() }}",
     "today": "{{ today() }}",
+    "date_add": "{{ date_add(now(), days=10) }}",
     "user_id": "{{ user_id }}",
     "order_id": "{{ order_id }}",
     "order_date": "{{ order_date }}",
