@@ -58,7 +58,7 @@ def dt_format(value: datetime.datetime | str, fmt: str) -> str:
 def random_string(length: int = 8) -> str:
     """Return a random string of the specified length."""
     letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    return "".join(random.choice(letters) for _ in range(length))
+    return "".join(random.choices(letters, k=length))
 
 
 def b64encode(value: str) -> str:
