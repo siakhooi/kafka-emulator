@@ -13,10 +13,6 @@ class Defaults(BaseModel):
     headers: dict[str, str] = {}
 
 
-class SetStep(BaseModel):
-    set: dict[str, str]
-
-
 class SendStep(BaseModel):
     topic: str
     body: str
@@ -24,26 +20,14 @@ class SendStep(BaseModel):
     headers: dict[str, str] = {}
 
 
-class SendStepWrapper(BaseModel):
-    send: SendStep
-
-
 class SleepStep(BaseModel):
     message: str | None = None
     duration: str = "0ms"
 
 
-class SleepStepWrapper(BaseModel):
-    sleep: SleepStep
-
-
 class PauseStep(BaseModel):
     message: str | None = None
     timeout: str | None = None
-
-
-class PauseStepWrapper(BaseModel):
-    pause: PauseStep
 
 
 class Step(BaseModel):
