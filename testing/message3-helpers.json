@@ -9,6 +9,8 @@
   "b64decode2": "{{ b64decode('aGVsbG8gZWFydGgK') | trim }}",
   "md5": "{{ md5('hello world') }}",
   "sha256": "{{ sha256('hello world') }}",
+  "urlencode": "{{ urlencode('hello world!') }}",
+  "urldecode": "{{ urldecode('hello%20world%21') }}",
   "user_id": "{{ user_id }}",
   "order_id": "{{ order_id }}",
   "order_date": "{{ order_date }}",

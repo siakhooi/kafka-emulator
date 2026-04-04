@@ -3,6 +3,7 @@ import datetime
 import hashlib
 import random
 import uuid
+from urllib.parse import quote, unquote
 
 
 def generate_uuid() -> str:
@@ -73,6 +74,16 @@ def sha256(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def urlencode(value: str) -> str:
+    """Return the URL-encoded version of the input string."""
+    return quote(value)
+
+
+def urldecode(value: str) -> str:
+    """Return the URL-decoded version of the input string."""
+    return unquote(value)
+
+
 def get_template_helpers() -> dict[str, callable]:
     """Return the map of template helper names to callable functions."""
     return {
@@ -89,4 +100,6 @@ def get_template_helpers() -> dict[str, callable]:
         "b64decode": b64decode,
         "md5": md5,
         "sha256": sha256,
+        "urlencode": urlencode,
+        "urldecode": urldecode,
     }
