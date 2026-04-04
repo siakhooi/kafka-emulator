@@ -194,7 +194,7 @@ def run_scenario(scenario_path: str) -> None:
                     headers=headers,
                 )
                 producer.flush()
-                logger.info(
+                logger.debug(
                     "Sent to topic '%s' key='%s'",
                     topic,
                     key,
