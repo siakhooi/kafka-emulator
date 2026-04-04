@@ -4,6 +4,10 @@ kafka:
   default:
     bootstrap_servers: "kafka-test:9092"
 
+defaults:
+    headers:
+      content-type: application/json
+
 steps:
   - set:
       user_id: "{{ uuid() }}"
@@ -27,6 +31,7 @@ steps:
       key: "{{ user_id }}"
       headers:
         x-user: "{{ user_id }}"
+        content-type: application/xml
       body: "message3-helpers.json"
   - pause:
       message: "Waiting for messages to be processed {{ order_id }}"

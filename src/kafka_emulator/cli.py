@@ -85,6 +85,9 @@ def run_scenario(scenario_path: str) -> None:
         "run_id": run_id,
     }
 
+    defaults = scenario.get("defaults", {})
+    default_headers = defaults.get("headers", {})
+
     kafka_config = scenario.get("kafka", {}).get("default", {})
     bootstrap_servers = kafka_config.get("bootstrap_servers", "localhost:9092")
 
@@ -112,7 +115,8 @@ def run_scenario(scenario_path: str) -> None:
                 key = send_config.get("key")
                 if key is not None:
                     key = render_template(str(key), context)
-                headers_dict = send_config.get("headers", {})
+                step_headers = send_config.get("headers", {})
+                headers_dict = {**default_headers, **step_headers}
                 body_file = send_config.get("body")
 
                 body_path = scenario_dir / body_file
@@ -183,9 +187,7 @@ def run() -> None:
     )
 
     parser.add_argument(
-        "-s", "--scenario",
-        type=str,
-        help="Path to scenario YAML file"
+        "-s", "--scenario", type=str, help="Path to scenario YAML file"
     )
 
     args = parser.parse_args()
