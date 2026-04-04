@@ -31,6 +31,10 @@ COLOR_MAGENTA = Fore.MAGENTA
 COLOR_RESET = Style.RESET_ALL
 
 
+def _print_step(tag: str, color: str, message: str) -> None:
+    print(f"{color}[{tag}]{COLOR_RESET} {message}")
+
+
 def print_to_stderr_and_exit(e: Exception, exit_code: int) -> None:
     print(f"Error: {e}", file=sys.stderr)
     exit(exit_code)
@@ -126,9 +130,11 @@ def run_scenario(scenario_path: str) -> None:
         shutdown_requested = True
         sig_name = signal.Signals(signum).name
         logger.warning("%s received, shutting down...", sig_name)
-        print(
-            f"\n{COLOR_YELLOW}[SHUTDOWN]{COLOR_RESET}"
-            f" {sig_name} received, shutting down..."
+        print()
+        _print_step(
+            "SHUTDOWN",
+            COLOR_YELLOW,
+            f"{sig_name} received, shutting down...",
         )
 
     original_sigint = signal.getsignal(signal.SIGINT)
@@ -147,9 +153,10 @@ def run_scenario(scenario_path: str) -> None:
                     rendered_value = render_template(str(value), context)
                     context[key] = rendered_value
                     logger.debug("Set %s = %s", key, rendered_value)
-                    print(
-                        f"{COLOR_CYAN}[SET]{COLOR_RESET}"
-                        f" {key} = {rendered_value}"
+                    _print_step(
+                        "SET",
+                        COLOR_CYAN,
+                        f"{key} = {rendered_value}",
                     )
 
             elif step.send is not None:
@@ -194,10 +201,10 @@ def run_scenario(scenario_path: str) -> None:
                 )
                 logger.debug("Body: %s", body)
                 logger.debug("Headers: %s", headers)
-                print(
-                    f"{COLOR_GREEN}[SEND]{COLOR_RESET}"
-                    f" Sent message to topic '{topic}'"
-                    f" with key '{key}'"
+                _print_step(
+                    "SEND",
+                    COLOR_GREEN,
+                    f"Sent message to topic '{topic}'" f" with key '{key}'",
                 )
 
             elif step.sleep is not None:
@@ -208,11 +215,12 @@ def run_scenario(scenario_path: str) -> None:
                 duration_str = sleep_config.duration
 
                 if message:
-                    print(f"{COLOR_YELLOW}[SLEEP]{COLOR_RESET}" f" {message}")
+                    _print_step("SLEEP", COLOR_YELLOW, message)
                 else:
-                    print(
-                        f"{COLOR_YELLOW}[SLEEP]{COLOR_RESET}"
-                        f" {duration_str}"
+                    _print_step(
+                        "SLEEP",
+                        COLOR_YELLOW,
+                        duration_str,
                     )
 
                 duration_seconds = parse_duration(duration_str)
@@ -229,25 +237,28 @@ def run_scenario(scenario_path: str) -> None:
                 if timeout_str:
                     timeout_seconds = parse_duration(timeout_str)
                     if message:
-                        print(
-                            f"{COLOR_MAGENTA}[PAUSE]{COLOR_RESET}"
-                            f" {message}"
+                        _print_step(
+                            "PAUSE",
+                            COLOR_MAGENTA,
+                            message,
                         )
-                    print(
-                        f"{COLOR_MAGENTA}[PAUSE]{COLOR_RESET}"
-                        f" Press any key"
-                        f" (timeout: {timeout_str})..."
+                    _print_step(
+                        "PAUSE",
+                        COLOR_MAGENTA,
+                        f"Press any key (timeout: {timeout_str})...",
                     )
                     wait_for_keypress(timeout_seconds)
                 else:
                     if message:
-                        print(
-                            f"{COLOR_MAGENTA}[PAUSE]{COLOR_RESET}"
-                            f" {message}"
+                        _print_step(
+                            "PAUSE",
+                            COLOR_MAGENTA,
+                            message,
                         )
-                    print(
-                        f"{COLOR_MAGENTA}[PAUSE]{COLOR_RESET}"
-                        f" Press any key to continue..."
+                    _print_step(
+                        "PAUSE",
+                        COLOR_MAGENTA,
+                        "Press any key to continue...",
                     )
                     wait_for_keypress(None)
 
