@@ -1,6 +1,6 @@
 [project]
 name = "kafka_emulator"
-version = "0.0.1"
+version = "0.1.0"
 description = "Kafka Messages Emulator"
 authors = [
     {name = "Siak Hooi",email = "siakhooi@gmail.com"}
