@@ -13,6 +13,11 @@ def now() -> str:
     return datetime.datetime.now().isoformat()
 
 
+def today() -> str:
+    """Return the current date in ISO 8601 format."""
+    return datetime.date.today().isoformat()
+
+
 def epoch() -> int:
     """Return the current time as a Unix timestamp."""
     return int(datetime.datetime.now().timestamp())
@@ -39,4 +44,5 @@ def get_template_helpers() -> dict[str, callable]:
         "randint": random.randint,
         "choice": random.choice,
         "random_string": random_string,
+        "today": today,
     }

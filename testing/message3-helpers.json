@@ -1,6 +1,8 @@
 {
     "time": "{{ epoch() }}",
     "time_ms": "{{ epoch_ms() }}",
+    "now": "{{ now() }}",
+    "today": "{{ today() }}",
     "user_id": "{{ user_id }}",
     "order_id": "{{ order_id }}",
     "order_date": "{{ order_date }}",
