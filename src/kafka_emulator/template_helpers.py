@@ -30,6 +30,7 @@ def epoch_ms() -> int:
 
 def date_add(
     base: datetime.datetime | str,
+    weeks: int = 0,
     days: int = 0,
     hours: int = 0,
     minutes: int = 0,
@@ -39,7 +40,7 @@ def date_add(
     if isinstance(base, str):
         base = datetime.datetime.fromisoformat(base)
     result = base + datetime.timedelta(
-        days=days, hours=hours, minutes=minutes, seconds=seconds
+        weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds
     )
     return result.isoformat()
 
