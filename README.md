@@ -1,31 +1,13 @@
 # kafka-emulator
 
-Kafka Messages Emulator
+`kafka-emulator` is a command-line tool for sending messages to Kafka topics
+using scenario files. Scenarios are defined in YAML and support Jinja2
+templates for dynamic content generation.
 
-## Installation
+## Documentation
 
-```
-pip install kafka_emulator
-```
-
-## Usage
-
-```
-$ kafka-emulator -h
-usage: kafka-emulator [-h] [-v] [-s SCENARIO] [--debug]
-                      [--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
-
-Kafka Messages Emulator
-
-options:
-  -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
-  -s, --scenario SCENARIO
-                        Path to scenario YAML file
-  --debug               Enable debug logging
-  --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
-                        Set log level (default: INFO)
-```
+- [User Guide](docs/user-guide.md) - Installation, Quick Start, Command Line Options
+- [Scenario YAML Specification](docs/scenario-spec.md)
 
 ## Links
 
