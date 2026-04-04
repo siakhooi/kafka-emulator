@@ -12,7 +12,8 @@ pip install kafka_emulator
 
 ```
 $ kafka-emulator -h
-usage: kafka-emulator [-h] [-v] [-s SCENARIO]
+usage: kafka-emulator [-h] [-v] [-s SCENARIO] [--debug]
+                      [--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
 
 Kafka Messages Emulator
 
@@ -21,6 +22,9 @@ options:
   -v, --version         show program's version number and exit
   -s, --scenario SCENARIO
                         Path to scenario YAML file
+  --debug               Enable debug logging
+  --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                        Set log level (default: INFO)
 ```
 
 ## Links
