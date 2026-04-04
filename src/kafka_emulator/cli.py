@@ -3,6 +3,7 @@ import datetime
 import json
 import re
 import select
+import signal
 import sys
 import time
 import uuid
@@ -109,8 +110,26 @@ def run_scenario(scenario_path: str) -> None:
         ),
     )
 
+    shutdown_requested = False
+
+    def handle_signal(signum, frame):
+        nonlocal shutdown_requested
+        shutdown_requested = True
+        sig_name = signal.Signals(signum).name
+        print(
+            f"\n{COLOR_YELLOW}[SHUTDOWN]{COLOR_RESET}"
+            f" {sig_name} received, shutting down..."
+        )
+
+    original_sigint = signal.getsignal(signal.SIGINT)
+    original_sigterm = signal.getsignal(signal.SIGTERM)
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+
     try:
         for step in scenario.steps:
+            if shutdown_requested:
+                break
             if step.set is not None:
                 set_config = step.set
                 for key, value in set_config.items():
@@ -212,7 +231,10 @@ def run_scenario(scenario_path: str) -> None:
                     wait_for_keypress(None)
 
     finally:
+        producer.flush()
         producer.close()
+        signal.signal(signal.SIGINT, original_sigint)
+        signal.signal(signal.SIGTERM, original_sigterm)
 
 
 def run() -> None:
