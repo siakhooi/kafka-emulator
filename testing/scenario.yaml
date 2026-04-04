@@ -20,6 +20,8 @@ steps:
       headers:
         header1: value1
         header2: value2
+        seq: "{{ seq() }}"
+        seq2: "{{ seq('custom_seq') }}"
   - sleep:
       message: "Waiting {{ order_id }} 500ms"
       duration: 500ms
@@ -30,6 +32,7 @@ steps:
       topic: "test-topic"
       key: "{{ user_id }}"
       headers:
+        seq: "{{ seq() }}"
         x-user: "{{ user_id }}"
         content-type: application/xml
       body: "message3-helpers.json"
@@ -40,6 +43,8 @@ steps:
       topic: "test-topic"
       key: "{{ user_id }}"
       headers:
+        seq: "{{ seq() }}"
+        seq2: "{{ seq('custom_seq') }}"
         x-user: "{{ user_id }}"
       body: "message4-random.json"
   - pause:
@@ -48,5 +53,6 @@ steps:
       topic: "test-topic"
       key: "{{ user_id }}"
       headers:
+        seq: "{{ seq() }}"
         x-user: "{{ user_id }}"
       body: "message5-meta.json"

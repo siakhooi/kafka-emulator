@@ -91,6 +91,15 @@ def urldecode(value: str) -> str:
     return unquote(value)
 
 
+_seq_counters: dict[str, int] = {}
+
+
+def seq(name: str = "default") -> int:
+    """Increment and return a named counter."""
+    _seq_counters[name] = _seq_counters.get(name, 0) + 1
+    return _seq_counters[name]
+
+
 def get_template_helpers() -> dict[str, callable]:
     """Return the map of template helper names to callable functions."""
     return {
@@ -110,4 +119,5 @@ def get_template_helpers() -> dict[str, callable]:
         "urlencode": urlencode,
         "urldecode": urldecode,
         "dt_format": dt_format,
+        "seq": seq,
     }
