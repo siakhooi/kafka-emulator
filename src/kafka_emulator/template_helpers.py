@@ -1,5 +1,6 @@
 import base64
 import datetime
+import hashlib
 import random
 import uuid
 
@@ -62,6 +63,16 @@ def b64decode(value: str) -> str:
     return base64.b64decode(value).decode("utf-8")
 
 
+def md5(value: str) -> str:
+    """Return the MD5 hash of the input string."""
+    return hashlib.md5(value.encode("utf-8")).hexdigest()
+
+
+def sha256(value: str) -> str:
+    """Return the SHA-256 hash of the input string."""
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
 def get_template_helpers() -> dict[str, callable]:
     """Return the map of template helper names to callable functions."""
     return {
@@ -76,4 +87,6 @@ def get_template_helpers() -> dict[str, callable]:
         "random_string": random_string,
         "b64encode": b64encode,
         "b64decode": b64decode,
+        "md5": md5,
+        "sha256": sha256,
     }

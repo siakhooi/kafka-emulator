@@ -7,6 +7,8 @@
   "b64encode": "{{ b64encode('hello world') }}",
   "b64decode1": "{{ b64decode('aGVsbG8gZWFydGg=') }}",
   "b64decode2": "{{ b64decode('aGVsbG8gZWFydGgK') | trim }}",
+  "md5": "{{ md5('hello world') }}",
+  "sha256": "{{ sha256('hello world') }}",
   "user_id": "{{ user_id }}",
   "order_id": "{{ order_id }}",
   "order_date": "{{ order_date }}",
