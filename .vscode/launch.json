@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "kafka-emulator: scenario",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "kafka_emulator.cli",
+            "args": [
+                "-s",
+                "testing/scenario.yaml"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

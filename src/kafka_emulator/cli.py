@@ -237,3 +237,7 @@ def run() -> None:
             run_scenario(args.scenario)
         except Exception as e:
             print_to_stderr_and_exit(e, 1)
+
+
+if __name__ == "__main__":
+    run()
