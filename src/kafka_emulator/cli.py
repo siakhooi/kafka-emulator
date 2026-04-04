@@ -16,6 +16,7 @@ from kafka import KafkaProducer
 
 from kafka_emulator.template_helpers import get_template_helpers
 from kafka_emulator.duration import parse_duration
+from kafka_emulator.models import Scenario
 
 colorama_init()
 
@@ -75,9 +76,11 @@ def run_scenario(scenario_path: str) -> None:
     scenario_dir = Path(scenario_path).parent
 
     with open(scenario_path, "r") as f:
-        scenario = yaml.safe_load(f)
+        raw = yaml.safe_load(f)
 
-    scenario_name = scenario.get("name", "unnamed")
+    scenario = Scenario(**raw)
+
+    scenario_name = scenario.name
     now_utc = datetime.datetime.now(datetime.timezone.utc)
     run_datetime = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
     scenario_name_normalized = re.sub(
@@ -94,11 +97,9 @@ def run_scenario(scenario_path: str) -> None:
         "run_id": run_id,
     }
 
-    defaults = scenario.get("defaults", {})
-    default_headers = defaults.get("headers", {})
+    default_headers = scenario.defaults.headers
 
-    kafka_config = scenario.get("kafka", {}).get("default", {})
-    bootstrap_servers = kafka_config.get("bootstrap_servers", "localhost:9092")
+    bootstrap_servers = scenario.kafka.default.bootstrap_servers
 
     producer = KafkaProducer(
         bootstrap_servers=bootstrap_servers,
@@ -109,28 +110,26 @@ def run_scenario(scenario_path: str) -> None:
     )
 
     try:
-        steps = scenario.get("steps", [])
-        for step in steps:
-            if "set" in step:
-                set_config = step["set"]
-                if set_config:
-                    for key, value in set_config.items():
-                        rendered_value = render_template(str(value), context)
-                        context[key] = rendered_value
-                        print(
-                            f"{COLOR_CYAN}[SET]{COLOR_RESET}"
-                            f" {key} = {rendered_value}"
-                        )
+        for step in scenario.steps:
+            if step.set is not None:
+                set_config = step.set
+                for key, value in set_config.items():
+                    rendered_value = render_template(str(value), context)
+                    context[key] = rendered_value
+                    print(
+                        f"{COLOR_CYAN}[SET]{COLOR_RESET}"
+                        f" {key} = {rendered_value}"
+                    )
 
-            elif "send" in step:
-                send_config = step["send"]
-                topic = send_config.get("topic")
-                key = send_config.get("key")
+            elif step.send is not None:
+                send_config = step.send
+                topic = send_config.topic
+                key = send_config.key
                 if key is not None:
                     key = render_template(str(key), context)
-                step_headers = send_config.get("headers", {})
+                step_headers = send_config.headers
                 headers_dict = {**default_headers, **step_headers}
-                body_file = send_config.get("body")
+                body_file = send_config.body
 
                 body_path = scenario_dir / body_file
                 with open(body_path, "r") as f:
@@ -162,12 +161,12 @@ def run_scenario(scenario_path: str) -> None:
                     f" with key '{key}'"
                 )
 
-            elif "sleep" in step:
-                sleep_config = step["sleep"]
-                message = sleep_config.get("message")
+            elif step.sleep is not None:
+                sleep_config = step.sleep
+                message = sleep_config.message
                 if message:
                     message = render_template(str(message), context)
-                duration_str = sleep_config.get("duration", "0ms")
+                duration_str = sleep_config.duration
 
                 if message:
                     print(f"{COLOR_YELLOW}[SLEEP]{COLOR_RESET}" f" {message}")
@@ -180,12 +179,12 @@ def run_scenario(scenario_path: str) -> None:
                 duration_seconds = parse_duration(duration_str)
                 time.sleep(duration_seconds)
 
-            elif "pause" in step:
-                pause_config = step["pause"]
-                message = pause_config.get("message")
+            elif step.pause is not None:
+                pause_config = step.pause
+                message = pause_config.message
                 if message:
                     message = render_template(str(message), context)
-                timeout_str = pause_config.get("timeout")
+                timeout_str = pause_config.timeout
 
                 if timeout_str:
                     timeout_seconds = parse_duration(timeout_str)
