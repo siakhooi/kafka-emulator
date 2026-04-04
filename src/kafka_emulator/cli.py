@@ -135,7 +135,7 @@ def _handle_send(
 
     try:
         body = json.dumps(json.loads(body), separators=(",", ":"))
-    except (json.JSONDecodeError, ValueError):
+    except ValueError:
         pass
 
     headers = None
@@ -162,7 +162,7 @@ def _handle_send(
     _print_step(
         "SEND",
         COLOR_GREEN,
-        f"Sent message to topic '{topic}'" f" with key '{key}'",
+        f"Sent message to topic '{topic}' with key '{key}'",
     )
 
 
