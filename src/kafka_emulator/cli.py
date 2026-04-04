@@ -79,6 +79,24 @@ def render_template(value: str | None, context: dict) -> str | None:
     return template.render(**render_context)
 
 
+def _build_run_context(scenario_name: str) -> dict:
+    """Build the run context for a scenario execution."""
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
+    run_datetime = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+    scenario_name_normalized = re.sub(
+        r"[^a-z0-9]+", "_", scenario_name.lower()
+    ).strip("_")
+    run_datetime_short = now_utc.strftime("%Y%m%d_%H%M%S")
+    run_name = f"{scenario_name_normalized}_{run_datetime_short}"
+    run_id = str(uuid.uuid4())
+    return {
+        "scenario_name": scenario_name,
+        "run_name": run_name,
+        "run_datetime": run_datetime,
+        "run_id": run_id,
+    }
+
+
 def run_scenario(scenario_path: str) -> None:
     """Run a scenario from a YAML file."""
     scenario_dir = Path(scenario_path).parent
@@ -90,22 +108,7 @@ def run_scenario(scenario_path: str) -> None:
     scenario = Scenario(**raw)
     logger.debug("Scenario validated: %s", scenario.name)
 
-    scenario_name = scenario.name
-    now_utc = datetime.datetime.now(datetime.timezone.utc)
-    run_datetime = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
-    scenario_name_normalized = re.sub(
-        r"[^a-z0-9]+", "_", scenario_name.lower()
-    ).strip("_")
-    run_datetime_short = now_utc.strftime("%Y%m%d_%H%M%S")
-    run_name = f"{scenario_name_normalized}_{run_datetime_short}"
-    run_id = str(uuid.uuid4())
-
-    context = {
-        "scenario_name": scenario_name,
-        "run_name": run_name,
-        "run_datetime": run_datetime,
-        "run_id": run_id,
-    }
+    context = _build_run_context(scenario.name)
     logger.debug("Context: %s", context)
 
     default_headers = scenario.defaults.headers
