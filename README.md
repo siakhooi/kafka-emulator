@@ -27,7 +27,6 @@ templates for dynamic content generation.
 ![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed-raw/siakhooi/kafka-emulator?logo=github)
 ![GitHub top language](https://img.shields.io/github/languages/top/siakhooi/kafka-emulator?logo=github)
 ![GitHub language count](https://img.shields.io/github/languages/count/siakhooi/kafka-emulator?logo=github)
-![Lines of code](https://img.shields.io/tokei/lines/github/siakhooi/kafka-emulator?logo=github)
 ![GitHub repo size](https://img.shields.io/github/repo-size/siakhooi/kafka-emulator?logo=github)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/siakhooi/kafka-emulator?logo=github)
 
