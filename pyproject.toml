@@ -1,16 +1,29 @@
 [project]
 name = "kafka_emulator"
-version = "0.3.0"
+version = "1.0.0"
 description = "Kafka Messages Emulator"
 authors = [
     {name = "Siak Hooi",email = "siakhooi@gmail.com"}
 ]
 keywords = [ "kafka" ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "License :: OSI Approved :: MIT License",
-    "Topic :: Utilities"
+    "Topic :: Utilities",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System :: Networking",
+    "Topic :: Communications"
 ]
 
 license = {text = "MIT"}
