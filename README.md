@@ -4,6 +4,27 @@
 using scenario files. Scenarios are defined in YAML and support Jinja2
 templates for dynamic content generation.
 
+**kafka-emulator** is the **last step** in a three-tool chain: it **produces** messages from an emulator configuration onto Kafka (commonly **development**). Config is usually generated from **[kafka-collector](https://github.com/siakhooi/kafka-collector)** captures via **[collector-to-emulator](https://github.com/siakhooi/collector-to-emulator)**, after any manual adjustments.
+
+## Related repositories (recommended workflow)
+
+This project works best **in sequence** with:
+
+| Step  | Repository                                                                 | Role                                                                  |
+| ----- | -------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| **1** | [kafka-collector](https://github.com/siakhooi/kafka-collector)             | Collect messages from Kafka topics (CLI + microservice).              |
+| **2** | [collector-to-emulator](https://github.com/siakhooi/collector-to-emulator) | Convert collected **JSONL** into files/config usable by the emulator. |
+| **3** | **kafka-emulator** (this repo)                                             | Produce the configured messages onto Kafka (e.g. dev).                |
+
+**Typical flow**
+
+1. Use **kafka-collector** to capture traffic from the topics you care about.
+2. Use **collector-to-emulator** to generate an **emulator configuration** from those captures.
+3. **Edit the config** as needed (secrets, ordering, scenarios, gaps).
+4. Use **kafka-emulator** to **replay** messages to your target Kafka.
+
+Together: **collect → convert → curate → replay**. For flags, modes, and deployment, see the sections below and [Documentation](#documentation).
+
 ## Documentation
 
 - [User Guide](docs/user-guide.md) - Installation, Quick Start, Command Line Options
