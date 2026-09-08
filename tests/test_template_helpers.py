@@ -32,7 +32,9 @@ class TestGenerateUuid:
         assert str(parsed) == result
 
     def test_returns_unique_values(self):
-        assert generate_uuid() != generate_uuid()
+        first_uuid = generate_uuid()
+        second_uuid = generate_uuid()
+        assert first_uuid != second_uuid
 
 
 class TestNow:
