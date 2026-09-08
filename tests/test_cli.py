@@ -142,8 +142,9 @@ class TestPrintStep:
 
 class TestPrintToStderrAndExit:
     def test_prints_error_and_exits(self, capsys):
+        error = ValueError("boom")
         with pytest.raises(SystemExit) as exc:
-            print_to_stderr_and_exit(ValueError("boom"), 42)
+            print_to_stderr_and_exit(error, 42)
         assert exc.value.code == 42
         captured = capsys.readouterr()
         assert "Error: boom" in captured.err
@@ -280,6 +281,22 @@ class TestHandleSend:
 
         sent_body = producer.send.call_args.kwargs["value"]
         assert sent_body == "plain text"
+
+    def test_rejects_body_path_outside_scenario_directory(
+        self,
+        tmp_path,
+    ):
+        (tmp_path / "outside.txt").write_text("body")
+        scenario_dir = tmp_path / "scenario"
+        step = Step(
+            send={
+                "topic": "t",
+                "body": "../outside.txt",
+            }
+        )
+
+        with pytest.raises(ValueError, match="inside the scenario directory"):
+            _handle_send(step, {}, {}, scenario_dir, MagicMock())
 
     def test_merges_default_and_step_headers(
         self,

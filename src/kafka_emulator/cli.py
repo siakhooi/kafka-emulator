@@ -127,9 +127,14 @@ def _handle_send(
     headers_dict = {**default_headers, **step_headers}
     body_file = send_config.body
 
-    body_path = scenario_dir / body_file
+    scenario_dir = scenario_dir.resolve()
+    body_path = (scenario_dir / body_file).resolve()
+    if not body_path.is_relative_to(scenario_dir):
+        raise ValueError(
+            "Message body path must be inside the scenario directory"
+        )
     logger.debug("Loading body from %s", body_path)
-    with open(body_path, "r") as f:
+    with body_path.open("r") as f:
         body_content = f.read()
     body = render_template(body_content, context)
 
@@ -227,10 +232,11 @@ def _handle_pause(step, context):
 
 def run_scenario(scenario_path: str) -> None:
     """Run a scenario from a YAML file."""
-    scenario_dir = Path(scenario_path).parent
+    scenario_file = Path(scenario_path).resolve()
+    scenario_dir = scenario_file.parent
     logger.info("Loading scenario from %s", scenario_path)
 
-    with open(scenario_path, "r") as f:
+    with scenario_file.open("r") as f:
         raw = yaml.safe_load(f)
 
     scenario = Scenario(**raw)
